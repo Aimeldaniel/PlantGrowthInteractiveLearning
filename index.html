@@ -1,94 +1,203 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Plant Learning App</title>
+  <title>Plant Simulation Game</title>
+
   <style>
-    body { font-family: Arial; text-align: center; background: #f0fff0; }
-    .card { background: white; padding: 20px; margin: 20px auto; width: 60%; border-radius: 10px; }
-    button { padding: 10px 20px; margin: 5px; cursor: pointer; }
-    #plant { font-size: 80px; margin-top: 20px; }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: Arial;
+    }
+
+    body {
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      transition: 1s;
+      background: linear-gradient(#b6f7b6, #6fdc6f);
+      overflow: hidden;
+    }
+
+    /* NIGHT MODE */
+    body.night {
+      background: linear-gradient(#0b1d3a, #02050f);
+      color: white;
+    }
+
+    .card {
+      background: rgba(255,255,255,0.9);
+      padding: 25px;
+      border-radius: 20px;
+      text-align: center;
+      width: 420px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+      position: relative;
+      z-index: 2;
+    }
+
+    body.night .card {
+      background: rgba(20,20,40,0.9);
+    }
+
+    #plant {
+      font-size: 120px;
+      margin: 20px 0;
+      transition: 0.8s;
+    }
+
+    .grow {
+      animation: grow 1.5s infinite alternate;
+    }
+
+    .wilt {
+      animation: wilt 1s infinite alternate;
+    }
+
+    @keyframes grow {
+      from { transform: scale(1); }
+      to { transform: scale(1.15); }
+    }
+
+    @keyframes wilt {
+      from { transform: rotate(0deg); opacity: 1; }
+      to { transform: rotate(8deg); opacity: 0.7; }
+    }
+
+    button {
+      padding: 10px 15px;
+      margin: 5px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .water { background: #4da6ff; color: white; }
+    .soil { background: #8B4513; color: white; }
+    .light { background: #ffd633; }
+
+    /* SUN / MOON */
+    .sun, .moon {
+      position: absolute;
+      top: 40px;
+      right: 60px;
+      font-size: 60px;
+      transition: 1s;
+    }
+
+    .moon {
+      display: none;
+    }
+
+    body.night .sun {
+      display: none;
+    }
+
+    body.night .moon {
+      display: block;
+    }
+
+    /* WATER ANIMATION */
+    .drop {
+      position: absolute;
+      top: -20px;
+      font-size: 20px;
+      animation: fall 1s linear forwards;
+    }
+
+    @keyframes fall {
+      to {
+        transform: translateY(500px);
+        opacity: 0;
+      }
+    }
+
   </style>
 </head>
 
 <body>
 
-<div class="card">
-  <h2>🌱 Pembelajaran Sains: Tumbuhan</h2>
-
-  <p><b>Situasi:</b></p>
-  <p>Ali menyiram pokok setiap hari tetapi meletakkannya di tempat gelap.</p>
-
-  <p><b>Apakah akan berlaku?</b></p>
-
-  <button onclick="answer('A')">Pokok tumbuh subur</button><br>
-  <button onclick="answer('B')">Pokok mati</button><br>
-  <button onclick="answer('C')">Pokok tidak berubah</button><br>
-
-  <p id="feedback"></p>
-</div>
+<div class="sun">☀️</div>
+<div class="moon">🌙</div>
 
 <div class="card">
-  <h3>🧪 Simulation: Tumbesaran Pokok</h3>
 
-  <p>Pilih keadaan:</p>
-
-  <label>Air:</label>
-  <select id="water">
-    <option value="1">Cukup</option>
-    <option value="0">Tiada</option>
-  </select>
-
-  <label>Cahaya:</label>
-  <select id="light">
-    <option value="1">Ada</option>
-    <option value="0">Tiada</option>
-  </select>
-
-  <label>Tanah:</label>
-  <select id="soil">
-    <option value="1">Subur</option>
-    <option value="0">Tidak subur</option>
-  </select>
-
-  <br><br>
-  <button onclick="growPlant()">Test</button>
+  <h2>🌱 Plant Learning Simulation</h2>
 
   <div id="plant">🌱</div>
-  <p id="result"></p>
+  <p id="status">Pokok baru ditanam</p>
+
+  <br>
+
+  <button class="water" onclick="addWater()">💧 Siram Air</button>
+  <button class="soil" onclick="addSoil()">🌱 Tanah</button>
+  <button class="light" onclick="toggleLight()">☀️ Cahaya</button>
+
 </div>
 
 <script>
-function answer(ans) {
-  if(ans === 'B') {
-    document.getElementById("feedback").innerHTML =
-    "✅ Betul! Pokok memerlukan cahaya matahari untuk hidup.";
-  } else {
-    document.getElementById("feedback").innerHTML =
-    "❌ Salah. Pokok tidak boleh hidup tanpa cahaya matahari.";
+let water = 0;
+let soil = 0;
+let light = 1;
+
+function addWater() {
+  water = 1;
+  rainEffect();
+  updatePlant();
+}
+
+function addSoil() {
+  soil = 1;
+  updatePlant();
+}
+
+function toggleLight() {
+  light = light === 1 ? 0 : 1;
+  document.body.classList.toggle("night");
+  updatePlant();
+}
+
+/* 💧 REAL WATER DROP EFFECT */
+function rainEffect() {
+  for(let i=0; i<10; i++) {
+    let drop = document.createElement("div");
+    drop.classList.add("drop");
+    drop.innerHTML = "💧";
+    drop.style.left = Math.random() * window.innerWidth + "px";
+    document.body.appendChild(drop);
+
+    setTimeout(() => drop.remove(), 1000);
   }
 }
 
-function growPlant() {
-  let water = document.getElementById("water").value;
-  let light = document.getElementById("light").value;
-  let soil = document.getElementById("soil").value;
-
+function updatePlant() {
   let plant = document.getElementById("plant");
-  let result = document.getElementById("result");
+  let status = document.getElementById("status");
 
-  let score = Number(water) + Number(light) + Number(soil);
+  let score = water + soil + light;
+
+  plant.classList.remove("grow", "wilt");
 
   if(score === 3) {
     plant.innerHTML = "🌳";
-    result.innerHTML = "Pokok membesar dengan sihat!";
-  } 
+    plant.classList.add("grow");
+    status.innerHTML = "Pokok sihat & membesar dengan baik!";
+  }
   else if(score === 2) {
     plant.innerHTML = "🌿";
-    result.innerHTML = "Pokok hidup tetapi kurang subur.";
-  } 
-  else {
+    status.innerHTML = "Pokok hidup tapi belum stabil.";
+  }
+  else if(score === 1) {
     plant.innerHTML = "🥀";
-    result.innerHTML = "Pokok mati kerana kekurangan keperluan asas.";
+    plant.classList.add("wilt");
+    status.innerHTML = "Pokok mula layu...";
+  }
+  else {
+    plant.innerHTML = "💀";
+    status.innerHTML = "Pokok mati.";
   }
 }
 </script>
