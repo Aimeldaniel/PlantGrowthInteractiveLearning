@@ -1,205 +1,209 @@
 <!DOCTYPE html>
-<html>
+<html lang="ms">
 <head>
-  <title>Plant Simulation Game</title>
+<meta charset="UTF-8">
+<title>Simulasi Tumbesaran Pokok</title>
 
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: Arial;
-    }
+<style>
+body {
+  font-family: Arial;
+  text-align: center;
+  margin: 0;
+  transition: 0.5s;
+  background: linear-gradient(#87ceeb, #e0f7ff);
+}
 
-    body {
-      height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      transition: 1s;
-      background: linear-gradient(#b6f7b6, #6fdc6f);
-      overflow: hidden;
-    }
+.dark {
+  background: linear-gradient(#1e2a38, #000);
+  color: white;
+}
 
-    /* NIGHT MODE */
-    body.night {
-      background: linear-gradient(#0b1d3a, #02050f);
-      color: white;
-    }
+/* Container */
+.container {
+  max-width: 900px;
+  margin: auto;
+  padding: 20px;
+}
 
-    .card {
-      background: rgba(255,255,255,0.9);
-      padding: 25px;
-      border-radius: 20px;
-      text-align: center;
-      width: 420px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-      position: relative;
-      z-index: 2;
-    }
+/* Plant Area */
+#plantArea {
+  font-size: 120px;
+  margin: 30px 0;
+  transition: 0.5s;
+}
 
-    body.night .card {
-      background: rgba(20,20,40,0.9);
-    }
+/* Animations */
+.grow {
+  animation: grow 1s infinite alternate;
+}
 
-    #plant {
-      font-size: 120px;
-      margin: 20px 0;
-      transition: 0.8s;
-    }
+.wilt {
+  animation: wilt 1s infinite alternate;
+}
 
-    .grow {
-      animation: grow 1.5s infinite alternate;
-    }
+@keyframes grow {
+  from { transform: scale(1); }
+  to { transform: scale(1.2); }
+}
 
-    .wilt {
-      animation: wilt 1s infinite alternate;
-    }
+@keyframes wilt {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(12deg); }
+}
 
-    @keyframes grow {
-      from { transform: scale(1); }
-      to { transform: scale(1.15); }
-    }
+/* Buttons */
+button {
+  padding: 12px 20px;
+  margin: 10px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: bold;
+}
 
-    @keyframes wilt {
-      from { transform: rotate(0deg); opacity: 1; }
-      to { transform: rotate(8deg); opacity: 0.7; }
-    }
+.water { background: #4da6ff; color: white; }
+.light { background: #ffd633; }
+.soil { background: #8B4513; color: white; }
 
-    button {
-      padding: 10px 15px;
-      margin: 5px;
-      border: none;
-      border-radius: 10px;
-      cursor: pointer;
-      font-weight: bold;
-    }
+/* Progress bars */
+.bar {
+  width: 80%;
+  height: 10px;
+  background: #ddd;
+  margin: 10px auto;
+  border-radius: 10px;
+}
 
-    .water { background: #4da6ff; color: white; }
-    .soil { background: #8B4513; color: white; }
-    .light { background: #ffd633; }
+.fill {
+  height: 100%;
+  width: 50%;
+  border-radius: 10px;
+}
 
-    /* SUN / MOON */
-    .sun, .moon {
-      position: absolute;
-      top: 40px;
-      right: 60px;
-      font-size: 60px;
-      transition: 1s;
-    }
+.waterFill { background: #4da6ff; }
+.lightFill { background: #ffd633; }
+.soilFill { background: #4CAF50; }
 
-    .moon {
-      display: none;
-    }
+.card {
+  background: white;
+  padding: 20px;
+  border-radius: 15px;
+  margin-top: 20px;
+}
 
-    body.night .sun {
-      display: none;
-    }
-
-    body.night .moon {
-      display: block;
-    }
-
-    /* WATER ANIMATION */
-    .drop {
-      position: absolute;
-      top: -20px;
-      font-size: 20px;
-      animation: fall 1s linear forwards;
-    }
-
-    @keyframes fall {
-      to {
-        transform: translateY(500px);
-        opacity: 0;
-      }
-    }
-
-  </style>
+.dark .card {
+  background: #2c3e50;
+}
+</style>
 </head>
 
 <body>
 
-<div class="sun">☀️</div>
-<div class="moon">🌙</div>
+<div class="container">
 
+<h2>🌱 Simulasi Tumbesaran Pokok</h2>
+<p id="day">Hari: 1</p>
+
+<div id="plantArea">🌱</div>
+<p id="status">Pokok baru ditanam</p>
+
+<!-- Controls -->
+<button class="water" onclick="addWater()">💧 Siram</button>
+<button class="soil" onclick="addSoil()">🌱 Baja</button>
+<button class="light" onclick="toggleLight()">☀️ Cahaya</button>
+
+<!-- Progress UI -->
 <div class="card">
+  <p>💧 Air</p>
+  <div class="bar"><div id="waterBar" class="fill waterFill"></div></div>
 
-  <h2>🌱 Plant Learning Simulation</h2>
+  <p>☀️ Cahaya</p>
+  <div class="bar"><div id="lightBar" class="fill lightFill"></div></div>
 
-  <div id="plant">🌱</div>
-  <p id="status">Pokok baru ditanam</p>
-
-  <br>
-
-  <button class="water" onclick="addWater()">💧 Siram Air</button>
-  <button class="soil" onclick="addSoil()">🌱 Tanah</button>
-  <button class="light" onclick="toggleLight()">☀️ Cahaya</button>
+  <p>🌱 Tanah</p>
+  <div class="bar"><div id="soilBar" class="fill soilFill"></div></div>
+</div>
 
 </div>
 
 <script>
-let water = 0;
-let soil = 0;
-let light = 1;
+let water = 50;
+let light = 50;
+let soil = 50;
+let day = 1;
+
+function updateBars() {
+  document.getElementById("waterBar").style.width = water + "%";
+  document.getElementById("lightBar").style.width = light + "%";
+  document.getElementById("soilBar").style.width = soil + "%";
+}
 
 function addWater() {
-  water = 1;
-  rainEffect();
-  updatePlant();
+  water = Math.min(100, water + 20);
 }
 
 function addSoil() {
-  soil = 1;
-  updatePlant();
+  soil = Math.min(100, soil + 20);
 }
 
 function toggleLight() {
-  light = light === 1 ? 0 : 1;
-  document.body.classList.toggle("night");
-  updatePlant();
-}
-
-/* 💧 REAL WATER DROP EFFECT */
-function rainEffect() {
-  for(let i=0; i<10; i++) {
-    let drop = document.createElement("div");
-    drop.classList.add("drop");
-    drop.innerHTML = "💧";
-    drop.style.left = Math.random() * window.innerWidth + "px";
-    document.body.appendChild(drop);
-
-    setTimeout(() => drop.remove(), 1000);
+  if (light > 0) {
+    light = 0;
+    document.body.classList.add("dark");
+  } else {
+    light = 100;
+    document.body.classList.remove("dark");
   }
 }
 
 function updatePlant() {
-  let plant = document.getElementById("plant");
+  let plant = document.getElementById("plantArea");
   let status = document.getElementById("status");
 
-  let score = water + soil + light;
+  let avg = (water + light + soil) / 3;
 
   plant.classList.remove("grow", "wilt");
 
-  if(score === 3) {
+  if(avg > 70) {
     plant.innerHTML = "🌳";
     plant.classList.add("grow");
-    status.innerHTML = "Pokok sihat & membesar dengan baik!";
+    status.innerHTML = "Pokok sihat 🌿";
   }
-  else if(score === 2) {
+  else if(avg > 40) {
     plant.innerHTML = "🌿";
-    status.innerHTML = "Pokok hidup tapi belum stabil.";
+    status.innerHTML = "Pokok sederhana";
   }
-  else if(score === 1) {
+  else if(avg > 20) {
     plant.innerHTML = "🥀";
     plant.classList.add("wilt");
-    status.innerHTML = "Pokok mula layu...";
+    status.innerHTML = "Pokok layu!";
   }
   else {
     plant.innerHTML = "💀";
-    status.innerHTML = "Pokok mati.";
+    status.innerHTML = "Pokok mati...";
   }
 }
+
+function nextDay() {
+  day++;
+  document.getElementById("day").innerHTML = "Hari: " + day;
+
+  // decay (realistic effect)
+  water -= 10;
+  soil -= 5;
+
+  water = Math.max(0, water);
+  soil = Math.max(0, soil);
+
+  updateBars();
+  updatePlant();
+}
+
+// auto day simulation
+setInterval(nextDay, 3000);
+
+updateBars();
+updatePlant();
 </script>
 
 </body>
