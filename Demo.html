@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Plant Learning App</title>
+  <style>
+    body { font-family: Arial; text-align: center; background: #f0fff0; }
+    .card { background: white; padding: 20px; margin: 20px auto; width: 60%; border-radius: 10px; }
+    button { padding: 10px 20px; margin: 5px; cursor: pointer; }
+    #plant { font-size: 80px; margin-top: 20px; }
+  </style>
+</head>
+
+<body>
+
+<div class="card">
+  <h2>🌱 Pembelajaran Sains: Tumbuhan</h2>
+
+  <p><b>Situasi:</b></p>
+  <p>Ali menyiram pokok setiap hari tetapi meletakkannya di tempat gelap.</p>
+
+  <p><b>Apakah akan berlaku?</b></p>
+
+  <button onclick="answer('A')">Pokok tumbuh subur</button><br>
+  <button onclick="answer('B')">Pokok mati</button><br>
+  <button onclick="answer('C')">Pokok tidak berubah</button><br>
+
+  <p id="feedback"></p>
+</div>
+
+<div class="card">
+  <h3>🧪 Simulation: Tumbesaran Pokok</h3>
+
+  <p>Pilih keadaan:</p>
+
+  <label>Air:</label>
+  <select id="water">
+    <option value="1">Cukup</option>
+    <option value="0">Tiada</option>
+  </select>
+
+  <label>Cahaya:</label>
+  <select id="light">
+    <option value="1">Ada</option>
+    <option value="0">Tiada</option>
+  </select>
+
+  <label>Tanah:</label>
+  <select id="soil">
+    <option value="1">Subur</option>
+    <option value="0">Tidak subur</option>
+  </select>
+
+  <br><br>
+  <button onclick="growPlant()">Test</button>
+
+  <div id="plant">🌱</div>
+  <p id="result"></p>
+</div>
+
+<script>
+function answer(ans) {
+  if(ans === 'B') {
+    document.getElementById("feedback").innerHTML =
+    "✅ Betul! Pokok memerlukan cahaya matahari untuk hidup.";
+  } else {
+    document.getElementById("feedback").innerHTML =
+    "❌ Salah. Pokok tidak boleh hidup tanpa cahaya matahari.";
+  }
+}
+
+function growPlant() {
+  let water = document.getElementById("water").value;
+  let light = document.getElementById("light").value;
+  let soil = document.getElementById("soil").value;
+
+  let plant = document.getElementById("plant");
+  let result = document.getElementById("result");
+
+  let score = Number(water) + Number(light) + Number(soil);
+
+  if(score === 3) {
+    plant.innerHTML = "🌳";
+    result.innerHTML = "Pokok membesar dengan sihat!";
+  } 
+  else if(score === 2) {
+    plant.innerHTML = "🌿";
+    result.innerHTML = "Pokok hidup tetapi kurang subur.";
+  } 
+  else {
+    plant.innerHTML = "🥀";
+    result.innerHTML = "Pokok mati kerana kekurangan keperluan asas.";
+  }
+}
+</script>
+
+</body>
+</html>
