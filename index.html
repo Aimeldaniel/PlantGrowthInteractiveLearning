@@ -1,210 +1,154 @@
-<!DOCTYPE html>
-<html lang="ms">
-<head>
-<meta charset="UTF-8">
-<title>Simulasi Tumbesaran Pokok</title>
+import { useState, useEffect } from "react";
 
-<style>
-body {
-  font-family: Arial;
-  text-align: center;
-  margin: 0;
-  transition: 0.5s;
-  background: linear-gradient(#87ceeb, #e0f7ff);
+export default function App() {
+  const [water, setWater] = useState(70);
+  const [light, setLight] = useState(70);
+  const [soil, setSoil] = useState(70);
+  const [day, setDay] = useState(1);
+
+  const avg = (water + light + soil) / 3;
+
+  const getPlant = () => {
+    if (avg > 70) return "🌳";
+    if (avg > 40) return "🌿";
+    if (avg > 20) return "🥀";
+    return "💀";
+  };
+
+  const getStatus = () => {
+    if (avg > 70) return "Sihat";
+    if (avg > 40) return "Tumbuh";
+    if (avg > 20) return "Layu";
+    return "Mati";
+  };
+
+  // AUTO DAY SIMULATION
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setDay(d => d + 1);
+      setWater(w => Math.max(0, w - 5));
+      setSoil(s => Math.max(0, s - 3));
+    }, 3000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  return (
+    <div className="flex h-screen bg-gray-100">
+
+      {/* SIDEBAR */}
+      <div className="w-64 bg-white p-5 border-r">
+        <h2 className="font-bold mb-5">🌱 Sains Tumbuhan</h2>
+        <ul className="space-y-2">
+          <li>Utama</li>
+          <li className="bg-green-100 p-2 rounded-lg font-semibold text-green-700">
+            Simulasi Tumbuhan
+          </li>
+          <li>Pembelajaran</li>
+          <li>Kuiz</li>
+          <li>Pencapaian</li>
+          <li>Nota</li>
+          <li>Tentang</li>
+        </ul>
+      </div>
+
+      {/* MAIN */}
+      <div className="flex-1 p-6">
+
+        <h1 className="text-2xl font-bold">
+          Simulasi Tumbesaran Pokok
+        </h1>
+        <p className="text-gray-500 mb-5">
+          Eksperimen secara interaktif dan lihat bagaimana keperluan asas mempengaruhi tumbesaran pokok
+        </p>
+
+        <div className="grid grid-cols-3 gap-5">
+
+          {/* CENTER CARD */}
+          <div className="col-span-2 bg-white rounded-2xl shadow p-5 relative">
+
+            {/* SKY */}
+            <div className={`h-72 rounded-xl relative overflow-hidden transition 
+              ${light === 0 ? "bg-gray-900" : "bg-gradient-to-b from-blue-300 to-blue-100"}`}>
+
+              {/* SUN / MOON */}
+              <div className={`absolute top-5 right-5 text-4xl transition`}>
+                {light > 0 ? "☀️" : "🌙"}
+              </div>
+
+              {/* DAY */}
+              <div className="absolute top-4 left-4 bg-white px-3 py-1 rounded text-sm shadow">
+                Hari: {day}
+              </div>
+
+              {/* PLANT */}
+              <div className="absolute bottom-[-20px] left-1/2 -translate-x-1/2 text-8xl transition-all duration-500 
+              hover:scale-110">
+                {getPlant()}
+              </div>
+            </div>
+
+            {/* SOIL */}
+            <div className="h-32 bg-amber-800 rounded-b-xl"></div>
+
+            {/* STATUS */}
+            <div className="absolute bottom-5 right-5 bg-green-100 text-green-700 px-3 py-2 rounded-lg text-sm">
+              {getStatus()}
+            </div>
+
+          </div>
+
+          {/* RIGHT PANEL */}
+          <div className="bg-white rounded-2xl shadow p-5">
+
+            <h3 className="font-semibold mb-4">Keperluan Asas</h3>
+
+            {/* WATER */}
+            <div className="mb-4">
+              <p>💧 Air</p>
+              <div className="w-full bg-gray-200 h-2 rounded">
+                <div className="bg-blue-500 h-2 rounded" style={{ width: water + "%" }}></div>
+              </div>
+              <button
+                className="mt-2 w-full bg-blue-500 text-white p-2 rounded"
+                onClick={() => setWater(w => Math.min(100, w + 15))}
+              >
+                Siram
+              </button>
+            </div>
+
+            {/* LIGHT */}
+            <div className="mb-4">
+              <p>☀️ Cahaya</p>
+              <div className="w-full bg-gray-200 h-2 rounded">
+                <div className="bg-yellow-400 h-2 rounded" style={{ width: light + "%" }}></div>
+              </div>
+              <button
+                className="mt-2 w-full bg-yellow-400 p-2 rounded"
+                onClick={() => setLight(l => (l > 0 ? 0 : 100))}
+              >
+                Toggle Cahaya
+              </button>
+            </div>
+
+            {/* SOIL */}
+            <div>
+              <p>🌱 Tanah</p>
+              <div className="w-full bg-gray-200 h-2 rounded">
+                <div className="bg-green-500 h-2 rounded" style={{ width: soil + "%" }}></div>
+              </div>
+              <button
+                className="mt-2 w-full bg-green-500 text-white p-2 rounded"
+                onClick={() => setSoil(s => Math.min(100, s + 15))}
+              >
+                Baja
+              </button>
+            </div>
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+  );
 }
-
-.dark {
-  background: linear-gradient(#1e2a38, #000);
-  color: white;
-}
-
-/* Container */
-.container {
-  max-width: 900px;
-  margin: auto;
-  padding: 20px;
-}
-
-/* Plant Area */
-#plantArea {
-  font-size: 120px;
-  margin: 30px 0;
-  transition: 0.5s;
-}
-
-/* Animations */
-.grow {
-  animation: grow 1s infinite alternate;
-}
-
-.wilt {
-  animation: wilt 1s infinite alternate;
-}
-
-@keyframes grow {
-  from { transform: scale(1); }
-  to { transform: scale(1.2); }
-}
-
-@keyframes wilt {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(12deg); }
-}
-
-/* Buttons */
-button {
-  padding: 12px 20px;
-  margin: 10px;
-  border: none;
-  border-radius: 10px;
-  cursor: pointer;
-  font-weight: bold;
-}
-
-.water { background: #4da6ff; color: white; }
-.light { background: #ffd633; }
-.soil { background: #8B4513; color: white; }
-
-/* Progress bars */
-.bar {
-  width: 80%;
-  height: 10px;
-  background: #ddd;
-  margin: 10px auto;
-  border-radius: 10px;
-}
-
-.fill {
-  height: 100%;
-  width: 50%;
-  border-radius: 10px;
-}
-
-.waterFill { background: #4da6ff; }
-.lightFill { background: #ffd633; }
-.soilFill { background: #4CAF50; }
-
-.card {
-  background: white;
-  padding: 20px;
-  border-radius: 15px;
-  margin-top: 20px;
-}
-
-.dark .card {
-  background: #2c3e50;
-}
-</style>
-</head>
-
-<body>
-
-<div class="container">
-
-<h2>🌱 Simulasi Tumbesaran Pokok</h2>
-<p id="day">Hari: 1</p>
-
-<div id="plantArea">🌱</div>
-<p id="status">Pokok baru ditanam</p>
-
-<!-- Controls -->
-<button class="water" onclick="addWater()">💧 Siram</button>
-<button class="soil" onclick="addSoil()">🌱 Baja</button>
-<button class="light" onclick="toggleLight()">☀️ Cahaya</button>
-
-<!-- Progress UI -->
-<div class="card">
-  <p>💧 Air</p>
-  <div class="bar"><div id="waterBar" class="fill waterFill"></div></div>
-
-  <p>☀️ Cahaya</p>
-  <div class="bar"><div id="lightBar" class="fill lightFill"></div></div>
-
-  <p>🌱 Tanah</p>
-  <div class="bar"><div id="soilBar" class="fill soilFill"></div></div>
-</div>
-
-</div>
-
-<script>
-let water = 50;
-let light = 50;
-let soil = 50;
-let day = 1;
-
-function updateBars() {
-  document.getElementById("waterBar").style.width = water + "%";
-  document.getElementById("lightBar").style.width = light + "%";
-  document.getElementById("soilBar").style.width = soil + "%";
-}
-
-function addWater() {
-  water = Math.min(100, water + 20);
-}
-
-function addSoil() {
-  soil = Math.min(100, soil + 20);
-}
-
-function toggleLight() {
-  if (light > 0) {
-    light = 0;
-    document.body.classList.add("dark");
-  } else {
-    light = 100;
-    document.body.classList.remove("dark");
-  }
-}
-
-function updatePlant() {
-  let plant = document.getElementById("plantArea");
-  let status = document.getElementById("status");
-
-  let avg = (water + light + soil) / 3;
-
-  plant.classList.remove("grow", "wilt");
-
-  if(avg > 70) {
-    plant.innerHTML = "🌳";
-    plant.classList.add("grow");
-    status.innerHTML = "Pokok sihat 🌿";
-  }
-  else if(avg > 40) {
-    plant.innerHTML = "🌿";
-    status.innerHTML = "Pokok sederhana";
-  }
-  else if(avg > 20) {
-    plant.innerHTML = "🥀";
-    plant.classList.add("wilt");
-    status.innerHTML = "Pokok layu!";
-  }
-  else {
-    plant.innerHTML = "💀";
-    status.innerHTML = "Pokok mati...";
-  }
-}
-
-function nextDay() {
-  day++;
-  document.getElementById("day").innerHTML = "Hari: " + day;
-
-  // decay (realistic effect)
-  water -= 10;
-  soil -= 5;
-
-  water = Math.max(0, water);
-  soil = Math.max(0, soil);
-
-  updateBars();
-  updatePlant();
-}
-
-// auto day simulation
-setInterval(nextDay, 3000);
-
-updateBars();
-updatePlant();
-</script>
-
-</body>
-</html>
