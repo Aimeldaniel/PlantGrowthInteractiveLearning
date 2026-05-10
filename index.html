@@ -1,13 +1,22 @@
-<?php
-$items = [
-    ["name" => "Pokok 🌳", "type" => "Hidup"],
-    ["name" => "Kucing 🐱", "type" => "Hidup"],
-    ["name" => "Ikan 🐟", "type" => "Hidup"],
-    ["name" => "Batu 🪨", "type" => "Bukan Hidup"],
-    ["name" => "Kereta 🚗", "type" => "Bukan Hidup"],
-    ["name" => "Pensel ✏️", "type" => "Bukan Hidup"]
-];
-?>
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sains Tahun 1 - Benda Hidup & Bukan Hidup</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <script>
+        const itemsData = [
+            { name: "Pokok 🌳", type: "Hidup" },
+            { name: "Kucing 🐱", type: "Hidup" },
+            { name: "Ikan 🐟", type: "Hidup" },
+            { name: "Batu 🪨", type: "Bukan Hidup" },
+            { name: "Kereta 🚗", type: "Bukan Hidup" },
+            { name: "Pensel ✏️", type: "Bukan Hidup" }
+        ];
+    </script>
 
 <!DOCTYPE html>
 <html lang="ms">
@@ -197,16 +206,7 @@ $items = [
         Seret objek ke kategori yang betul!
     </div>
 
-    <div class="items">
-        <?php foreach($items as $item): ?>
-            <div class="item"
-                 draggable="true"
-                 data-type="<?= $item['type']; ?>"
-                 data-name="<?= $item['name']; ?>">
-                <?= $item['name']; ?>
-            </div>
-        <?php endforeach; ?>
-    </div>
+    <div class="items" id="itemsContainer"></div>
 
     <div class="dropzones">
 
@@ -250,6 +250,20 @@ $items = [
     const zones = document.querySelectorAll('.zone');
     const scoreDisplay = document.getElementById('score');
     const message = document.getElementById('message');
+
+    const itemsContainer = document.getElementById('itemsContainer');
+
+    itemsData.forEach(data => {
+        const div = document.createElement('div');
+        div.className = 'item';
+        div.draggable = true;
+        div.dataset.type = data.type;
+        div.dataset.name = data.name;
+        div.innerHTML = data.name;
+        itemsContainer.appendChild(div);
+    });
+
+    const items = document.querySelectorAll('.item');
 
     items.forEach(item => {
         item.addEventListener('dragstart', () => {
